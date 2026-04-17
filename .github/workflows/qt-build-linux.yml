@@ -1,0 +1,56 @@
+name: Shared Qt Linux Build
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+      artifact_name:
+        required: true
+        type: string
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout shared tools
+        uses: actions/checkout@v4
+        with:
+          repository: Bolbe/Tools
+          path: scripts
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            chrpath \
+            libxkbcommon-x11-dev \
+            mesa-common-dev \
+            freeglut3 \
+            freeglut3-dev \
+            libglu1-mesa \
+            libglu1-mesa-dev \
+            libgl1 \
+            libgl1-mesa-dev
+
+      - name: Download Qt
+        working-directory: ${{ runner.temp }}
+        run: |
+          wget -q https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/ubuntu/Qt653-ubuntu2204.tar.xz
+          tar xf Qt653-ubuntu2204.tar.xz
+
+      - name: Build 
+        working-directory: ${{ github.workspace }} 
+        env: 
+          QT_PATH: ${{ runner.temp }}/Qt-6.5.3 
+        run: bash ./scripts/build-linux.sh ${{ inputs.artifact_name }} ${{ inputs.app_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: ${{ github.workspace }}/${{ inputs.artifact_name }}.AppImage
