@@ -38,7 +38,7 @@ make -j$(nproc)
 echo "Creating package folder..."
 mkdir -p package
 cp ./$LINUX_BIN_FILE package/$LINUX_BIN_FILE
-cp ../qml256.png package/qml256.png
+cp ../icon256.png package/icon256.png
 cp ../AppRun package/AppRun
 cp ../$LINUX_APP_IMAGE.desktop package/$LINUX_APP_IMAGE.desktop
 
