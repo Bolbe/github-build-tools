@@ -20,7 +20,7 @@ jobs:
       - name: Checkout shared tools
         uses: actions/checkout@v4
         with:
-          repository: Bolbe/Tools
+          repository: Bolbe/github-build-tools
           path: scripts
 
       - name: Install dependencies
@@ -47,7 +47,9 @@ jobs:
         working-directory: ${{ github.workspace }} 
         env: 
           QT_PATH: ${{ runner.temp }}/Qt-6.5.3 
-        run: bash ./scripts/build-linux.sh ${{ inputs.artifact_name }} ${{ inputs.app_name }}
+        run: |
+          ls -la
+          bash ./scripts/build-linux.sh ${{ inputs.artifact_name }} ${{ inputs.app_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
