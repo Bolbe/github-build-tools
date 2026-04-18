@@ -131,6 +131,5 @@ rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/designer
 rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/iOS
 rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/impl
 
-# We need to zip here because the macOS app bundle is a directory and GitHub Actions artifact upload doesn't support directories, but it does support zip files. After uploading, we can unzip it back to the .app format for distribution.
 ditto -c -k --sequesterRsrc --keepParent $appName.app $appName.app.zip
-mv $appName.app ..
+mv $appName.app.zip ..

@@ -37,4 +37,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.app_name }}-macos
-          path: ${{ github.workspace }}/${{ inputs.app_name }}.app
+          path: ${{ github.workspace }}/${{ inputs.app_name }}.app.zip
+          
