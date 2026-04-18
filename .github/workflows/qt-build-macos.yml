@@ -24,7 +24,7 @@ jobs:
       - name: Download Qt 6.5.3 Compiler for MacOS
         working-directory: ${{ runner.temp }}
         run: |
-          curl -L -o Qt653-macos.tar.xz http://89.47.50.20/Qt-precompiled/Qt653-macos.tar.xz
+          curl -L -o Qt653-macos.tar.xz https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/macos/Qt653-macos.tar.xz
           tar xf ./Qt653-macos.tar.xz
 
       - name: Compile project and build package

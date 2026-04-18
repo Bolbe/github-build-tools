@@ -35,7 +35,7 @@ jobs:
         working-directory: ${{ runner.temp }} 
         shell: pwsh 
         run: | 
-          curl.exe -L -o QtMingw64.7z http://89.47.50.20/Qt-precompiled/QtMingw64.7z
+          curl.exe -L -o QtMingw64.7z https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/windows/QtMingw64.7z
           7z x QtMingw64.7z
 
       - name: Build project
