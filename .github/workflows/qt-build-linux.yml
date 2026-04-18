@@ -49,6 +49,7 @@ jobs:
           QT_PATH: ${{ runner.temp }}/Qt-6.5.3 
         run: |
           ls -la
+          ls -la ./scripts
           bash ./scripts/build-linux.sh ${{ inputs.artifact_name }} ${{ inputs.app_name }}
 
       - name: Upload artifact
