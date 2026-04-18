@@ -48,7 +48,7 @@ jobs:
         env: 
           QT_PATH: ${{ runner.temp }}/Qt-6.5.3 
         run: |
-          bash ./build-tools/scripts/build-linux.sh ${{ inputs.artifact_name }} ${{ inputs.app_name }}
+          bash ./build-tools/scripts/build-linux.sh ${{ inputs.app_name }} ${{ inputs.artifact_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
