@@ -53,5 +53,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: ${{ inputs.artifact_name }}-linux
           path: ${{ github.workspace }}/${{ inputs.artifact_name }}.AppImage

@@ -49,6 +49,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: qmldemo-windows
-          path: ${{ github.workspace }}\qmldemo
+          name: ${{ inputs.artifact_name }}-windows
+          path: ${{ github.workspace }}\${{ inputs.artifact_name }}
 
