@@ -6,16 +6,14 @@ on:
       app_name:
         required: true
         type: string
-      artifact_name:
-        required: true
-        type: string
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-22.04
+  build-macos:
+    runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source 
+        uses: actions/checkout@v4
 
       - name: Checkout shared tools
         uses: actions/checkout@v4
@@ -23,35 +21,20 @@ jobs:
           repository: Bolbe/github-build-tools
           path: build-tools
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            chrpath \
-            libxkbcommon-x11-dev \
-            mesa-common-dev \
-            freeglut3 \
-            freeglut3-dev \
-            libglu1-mesa \
-            libglu1-mesa-dev \
-            libgl1 \
-            libgl1-mesa-dev
-
-      - name: Download Qt
+      - name: Download Qt 6.5.3 Compiler for MacOS
         working-directory: ${{ runner.temp }}
         run: |
-          wget -q http://89.47.50.20/Qt-precompiled/Qt653-ubuntu2204.tar.xz
-          tar xf Qt653-ubuntu2204.tar.xz
+          curl -L -o Qt653-macos.tar.xz http://89.47.50.20/Qt-precompiled/Qt653-macos.tar.xz
+          tar xf ./Qt653-macos.tar.xz
 
-      - name: Build 
+      - name: Compile project and build package
         working-directory: ${{ github.workspace }}
-        env: 
-          QT_PATH: ${{ runner.temp }}/Qt-6.5.3 
-        run: |
-          bash ./build-tools/scripts/build-linux.sh ${{ inputs.app_name }} ${{ inputs.artifact_name }}
+        env:
+          QT_PATH: ${{ runner.temp }}/Qt-6.5.3
+        run: zsh ./build-tools/scripts/build-macos.sh ${{ inputs.app_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux
-          path: ${{ github.workspace }}/${{ inputs.artifact_name }}.AppImage
+          name: qmldemo-macos
+          path: ${{ github.workspace }}/${{ inputs.exe_name }}.app
