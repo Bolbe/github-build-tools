@@ -42,8 +42,21 @@ echo "Creating package folder..."
 mkdir -p package
 cp ./$LINUX_BIN_FILE package/$LINUX_BIN_FILE
 cp $SCRIPT_DIR/default-icon.svg package/default-icon.svg
-cp ../AppRun package/AppRun
-cp ../$LINUX_APP_IMAGE.desktop package/$LINUX_APP_IMAGE.desktop
+
+cat > package/AppRun <<EOF
+#!/bin/sh
+SELF_DIR="\$(dirname "\$(readlink -f "\$0")")"
+LD_LIBRARY_PATH="\$SELF_DIR/lib" QT_QPA_PLATFORM_PLUGIN_PATH="\$SELF_DIR/plugins" exec "\$SELF_DIR/$LINUX_BIN_FILE"
+EOF
+chmod +x package/AppRun
+
+cat > package/$LINUX_APP_IMAGE.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=$LINUX_BIN_FILE
+Icon=default-icon
+Categories=Utility;
+EOF
 
 echo "Copying shared libraries to lib folder..."
 mkdir -p package/lib
