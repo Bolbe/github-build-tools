@@ -1,0 +1,74 @@
+name: Shared Qt Linux Static Build
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout shared tools
+        uses: actions/checkout@v4
+        with:
+          repository: Bolbe/github-build-tools
+          path: build-tools
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            chrpath \
+            libxkbcommon-x11-dev \
+            mesa-common-dev \
+            freeglut3 \
+            freeglut3-dev \
+            libglu1-mesa \
+            libglu1-mesa-dev \
+            libgl1 \
+            libgl1-mesa-dev \
+            build-essential \
+            cmake \
+            libfontconfig1-dev \
+            libfreetype6-dev \
+            libx11* \
+            libxext-dev \
+            libxfixes-dev \
+            libxi-dev \
+            libxrender-dev \
+            libxcb* \
+            libgl1-mesa-glx \
+            libgl1-mesa-dev \
+            zlib1g-dev \
+            liblzma-dev \
+            libbz2-dev \
+
+      - name: Download Qt
+        working-directory: ${{ runner.temp }}
+        run: |
+          wget -q https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/ubuntu/Qt653-static-ubuntu2204.tar.xz
+          tar xf Qt653-static-ubuntu2204.tar.xz
+          cat > ./Qt-6.5.3-static/bin/qt.conf <<EOF
+          [Paths]
+          Prefix=${{ runner.temp }}/Qt-6.5.3-static
+          EOF
+
+      - name: Build
+        working-directory: ${{ github.workspace }}
+        env:
+          QT_PATH: ${{ runner.temp }}/Qt-6.5.3-static
+        run: |
+          bash ./build-tools/scripts/build-static-linux.sh ${{ inputs.app_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}-linux
+          path: ${{ github.workspace }}/${{ inputs.app_name }}
+
