@@ -31,7 +31,7 @@ jobs:
         run: chmod +x ./scripts/Qt/build-qt-static-macos.sh
 
       - name: Build static Qt
-        run: ./Qt/build-qt-static-macos.sh
+        run: ./scripts/Qt/build-qt-static-macos.sh
         env:
           INSTALL_DIR: ${{ env.INSTALL_DIR }}
 
