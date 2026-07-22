@@ -1,0 +1,43 @@
+name: Build Static Qt (macOS)
+
+on:
+  workflow_dispatch:      # manual trigger, e.g. from the Actions tab
+  # push:
+  #   paths:
+  #     - 'build-qt-static.sh'
+
+jobs:
+  build-qt:
+    runs-on: macos-14      # pin the runner (e.g. macos-14 for Apple Silicon,
+                            # macos-13 for Intel) rather than "macos-latest"
+                            # so builds stay reproducible as GitHub rotates images
+    timeout-minutes: 360   # static Qt builds are slow; adjust as needed
+
+    env:
+      INSTALL_DIR: ${{ github.workspace }}/qt-install
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Cache the downloaded source tarball + extracted tree across runs
+      - name: Cache Qt source
+        uses: actions/cache@v4
+        with:
+          path: ~/qt-build
+          key: qt-src-6.5.3
+
+      - name: Make build script executable
+        run: chmod +x ./scripts/Qt/build-qt-static-macos.sh
+
+      - name: Build static Qt
+        run: ./Qt/build-qt-static-macos.sh
+        env:
+          INSTALL_DIR: ${{ env.INSTALL_DIR }}
+
+      - name: Upload built Qt as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qt-6.5.3-static-macos
+          path: ${{ env.INSTALL_DIR }}
+          retention-days: 14

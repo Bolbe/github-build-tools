@@ -44,7 +44,7 @@ jobs:
         env:
           QT_PATH: ${{ runner.temp }}/QtMingw64
           MINGW_PATH: ${{ runner.temp }}/mingw64
-        run: ./build-tools/scripts/build-windows.ps1 ${{ inputs.exe_name }} ${{ inputs.artifact_name }}
+        run: ./build-tools/scripts/applications/build-windows-app.ps1 ${{ inputs.exe_name }} ${{ inputs.artifact_name }}
         
       - name: Upload artifact
         uses: actions/upload-artifact@v4

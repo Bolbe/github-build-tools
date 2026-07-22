@@ -31,7 +31,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         env:
           QT_PATH: ${{ runner.temp }}/Qt-6.5.3
-        run: zsh ./build-tools/scripts/build-macos.sh ${{ inputs.app_name }}
+        run: zsh ./build-tools/scripts/applications/build-macos-app.sh ${{ inputs.app_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
