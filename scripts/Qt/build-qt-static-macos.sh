@@ -23,7 +23,7 @@ BUILD_DIR="${BUILD_DIR:-$HOME/qt-build}"
 JOBS="${JOBS:-$(sysctl -n hw.ncpu)}"
 
 SRC_TARBALL="qt-everywhere-src-6.5.3.tar.xz"
-SRC_URL="https://download.qt.io/archive/qt/6.5/6.5.3/single/$SRC_TARBALL "
+SRC_URL="https://download.qt.io/archive/qt/6.5/6.5.3/single/$SRC_TARBALL"
 SRC_DIR="qt-everywhere-src-6.5.3"
 
 # Modules to strip out before configuring (trims build time / unused deps)
