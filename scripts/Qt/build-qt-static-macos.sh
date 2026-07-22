@@ -67,7 +67,7 @@ mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
 if [[ ! -f "$SRC_TARBALL" ]]; then
-  log "Downloading Qt $QT_VERSION source"
+  log "Downloading $SRC_TARBALL from $SRC_URL"
   curl -fL --retry 3 -o "$SRC_TARBALL" "$SRC_URL"
 else
   log "Source tarball already present, skipping download"
