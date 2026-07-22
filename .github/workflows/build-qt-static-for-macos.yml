@@ -2,15 +2,22 @@ name: Build Static Qt (macOS)
 
 on:
   workflow_dispatch:      # manual trigger, e.g. from the Actions tab
+    inputs:
+      runner:
+        description: 'macOS runner (13 = Intel, 14 = Apple Silicon)'
+        required: true
+        default: 'macos-14'
+        type: choice
+        options:
+          - macos-13
+          - macos-14
   # push:
   #   paths:
   #     - 'build-qt-static.sh'
 
 jobs:
   build-qt:
-    runs-on: macos-14      # pin the runner (e.g. macos-14 for Apple Silicon,
-                            # macos-13 for Intel) rather than "macos-latest"
-                            # so builds stay reproducible as GitHub rotates images
+    runs-on: ${{ github.event.inputs.runner }}      
     timeout-minutes: 360   # static Qt builds are slow; adjust as needed
 
     env:
@@ -27,9 +34,6 @@ jobs:
           path: ~/qt-build
           key: qt-src-6.5.3
 
-      - name: Make build script executable
-        run: chmod +x ./scripts/Qt/build-qt-static-macos.sh
-
       - name: Build static Qt
         run: ./scripts/Qt/build-qt-static-macos.sh
         env:
@@ -40,4 +44,4 @@ jobs:
         with:
           name: qt-6.5.3-static-macos
           path: ${{ env.INSTALL_DIR }}
-          retention-days: 14
+          retention-days: 5
