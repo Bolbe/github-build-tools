@@ -1,23 +1,10 @@
-name: Build Static Qt (macOS)
+name: Build Static Qt (macOS) Apple Silicon only.
 
-on:
-  workflow_dispatch:      # manual trigger, e.g. from the Actions tab
-    inputs:
-      runner:
-        description: 'macOS runner (13 = Intel, 14 = Apple Silicon)'
-        required: true
-        default: 'macos-14'
-        type: choice
-        options:
-          - macos-13
-          - macos-14
-  # push:
-  #   paths:
-  #     - 'build-qt-static.sh'
+on: workflow_dispatch      # manual trigger, e.g. from the Actions tab
 
 jobs:
   build-qt:
-    runs-on: ${{ github.event.inputs.runner }}      
+    runs-on: macos-14      
     timeout-minutes: 360   # static Qt builds are slow; adjust as needed
 
     env:
@@ -35,13 +22,14 @@ jobs:
           key: qt-src-6.5.3
 
       - name: Build static Qt
-        run: ./scripts/Qt/build-qt-static-macos.sh
+        run: ./scripts/Qt/macos/build-qt-static-macos.sh
         env:
           INSTALL_DIR: ${{ env.INSTALL_DIR }}
 
+      # Upload the tarball of the static built: $INSTALL_DIR.tar.xz
       - name: Upload built Qt as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: qt-6.5.3-static-macos
-          path: ${{ env.INSTALL_DIR }}
+          name: Qt6.5.3-macos-static
+          path: ${{ env.INSTALL_DIR }}.tar.xz
           retention-days: 5

@@ -21,6 +21,7 @@ set -euo pipefail
 INSTALL_DIR="${INSTALL_DIR:-$HOME/Qt6.5.3-static}"
 BUILD_DIR="${BUILD_DIR:-$HOME/qt-build}"
 JOBS="${JOBS:-$(sysctl -n hw.ncpu)}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SRC_TARBALL="qt-everywhere-src-6.5.3.tar.xz"
 SRC_URL="https://download.qt.io/archive/qt/6.5/6.5.3/single/$SRC_TARBALL"
@@ -94,6 +95,16 @@ for module in "${MODULES_TO_REMOVE[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
+# Patch source for static build: 
+# macos-13 or macos-14 compile 6.5.3 fine. Newer versions require these patches.
+# ---------------------------------------------------------------------------
+log "Apply patches for static build"
+echo "  patching qtbase/src/3rdparty/libpng/pngpriv.h"
+cp "$SCRIPT_DIR/patches/qtbase/src/3rdparty/libpng/pngpriv.h" ./qtbase/src/3rdparty/libpng/pngpriv.h
+echo "  patching qtbase/cmake/FindWrapOpenGL.cmake"
+cp "$SCRIPT_DIR/patches/qtbase/cmake/FindWrapOpenGL.cmake" ./qtbase/cmake/FindWrapOpenGL.cmake
+
+# ---------------------------------------------------------------------------
 # Configure
 # ---------------------------------------------------------------------------
 log "Configuring Qt (static, release, prefix=$INSTALL_DIR)"
@@ -111,7 +122,7 @@ log "Configuring Qt (static, release, prefix=$INSTALL_DIR)"
   -strip
 
 # ---------------------------------------------------------------------------
-# Build & install
+# Build, install, compress
 # ---------------------------------------------------------------------------
 log "Building with $JOBS parallel jobs (this will take a while)"
 cmake --build . --parallel "$JOBS"
@@ -119,4 +130,6 @@ cmake --build . --parallel "$JOBS"
 log "Installing to $INSTALL_DIR"
 cmake --install .
 
-log "Done. Static Qt 6.5.3installed at: $INSTALL_DIR"
+XZ_OPT='-9' tar -cJf "$INSTALL_DIR".tar.xz "$INSTALL_DIR"
+
+log "Done. Static Qt 6.5.3 tarball at: $INSTALL_DIR.tar.xz"
