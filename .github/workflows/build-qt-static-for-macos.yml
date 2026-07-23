@@ -8,7 +8,7 @@ jobs:
     timeout-minutes: 360   # static Qt builds are slow; adjust as needed
 
     env:
-      INSTALL_DIR: ${{ github.workspace }}/qt-install
+      INSTALL_DIR: ${{ github.workspace }}/Qt6.5.3-static
 
     steps:
       - name: Checkout repo
@@ -30,6 +30,6 @@ jobs:
       - name: Upload built Qt as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Qt6.5.3-macos-static
+          name: Qt6.5.3-static
           path: ${{ env.INSTALL_DIR }}.tar.xz
           retention-days: 5

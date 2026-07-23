@@ -130,6 +130,7 @@ cmake --build . --parallel "$JOBS"
 log "Installing to $INSTALL_DIR"
 cmake --install .
 
-XZ_OPT='-9' tar -cJf "$INSTALL_DIR".tar.xz "$INSTALL_DIR"
+log "Compressing $INSTALL_DIR"
+XZ_OPT='-9' tar -C "$(dirname "$INSTALL_DIR")" -cJf "$INSTALL_DIR.tar.xz" "$(basename "$INSTALL_DIR")"
 
 log "Done. Static Qt 6.5.3 tarball at: $INSTALL_DIR.tar.xz"
