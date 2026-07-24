@@ -1,0 +1,46 @@
+name: Static Qt MacOS Build
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+      chipset:  # default to arm64, but can be overridden to x86_64
+        default: arm64
+        required: false
+        type: string
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source 
+        uses: actions/checkout@v4
+
+      # if chipset is arm64, download Qt6.5.3-static-arm64.tar.xz, if x86_64, download Qt6.5.3-static-x86_64.tar.xz
+      - name: Download Qt 6.5.3 Static Compiler for MacOS
+        working-directory: ${{ runner.temp }}
+        run: |
+          if [ "${{ inputs.chipset }}" = "arm64" ]; then
+            echo "Downloading Qt6.5.3-static-arm64.tar.xz"
+            curl -L -o Qt6.5.3-static.tar.xz https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/macos/Qt6.5.3-static-arm64.tar.xz
+          else
+            echo "Downloading Qt6.5.3-static-x86_64.tar.xz"
+            curl -L -o Qt6.5.3-static.tar.xz https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/macos/Qt6.5.3-static-x86_64.tar.xz
+          fi
+          tar xf ./Qt6.5.3-static.tar.xz
+
+      - name: Compile project and build package
+        working-directory: ${{ github.workspace }}
+        run: |
+          ${{ runner.temp }}/Qt-6.5.3-static/bin/qmake .
+          make -j$(sysctl -n hw.ncpu)
+  
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}-macos
+          path: ${{ github.workspace }}/${{ inputs.app_name }}.app
+          

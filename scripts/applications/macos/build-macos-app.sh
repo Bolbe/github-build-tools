@@ -1,9 +1,7 @@
 #!/bin/bash
 
-set -e  # Exit on any error
-set -u  # Treat unset variables as errors
+set -euo pipefail
 
-#appName="QMLDemo"
 appName="$1"
 
 #Check if required arguments are provided
