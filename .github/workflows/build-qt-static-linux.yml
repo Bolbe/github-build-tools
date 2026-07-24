@@ -16,6 +16,7 @@ jobs:
             xz-utils \
             build-essential \
             cmake \
+            ninja-build \
             libfontconfig1-dev \
             libfreetype6-dev \
             libx11* \
@@ -38,6 +39,11 @@ jobs:
             liblzma-dev \
             libbz2-dev
           sudo apt-get clean
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          df -h
 
       - name: Download Qt 6.5.3 source
         run: |
@@ -80,11 +86,16 @@ jobs:
       - name: Install Qt
         working-directory: qt-everywhere-src-6.5.3
         run: |
-          cmake --install . --prefix ${{ github.workspace }}/Qt6.5.3-static
+          cmake --install .
+
+      - name: Clean up source tree
+        run: |
+          rm -rf qt-everywhere-src-6.5.3 qt-everywhere-src-6.5.3.tar.xz
+          df -h
 
       - name: Tar the installed Qt directory
         working-directory: ${{ github.workspace }}
-        run: |  
+        run: |
           XZ_OPT='-9' tar -cJf ${{ github.workspace }}/Qt6.5.3-static-ubuntu2204.tar.xz Qt6.5.3-static
 
       - name: Upload artifact
