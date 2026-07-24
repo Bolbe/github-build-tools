@@ -1,4 +1,4 @@
-name: Shared Qt Linux Static Build
+name: Building Application with Qt static libraries for Linux
 
 on:
   workflow_call:
@@ -12,13 +12,8 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Checkout shared tools
+      - name: Checkout source 
         uses: actions/checkout@v4
-        with:
-          repository: Bolbe/github-build-tools
-          path: build-tools
 
       - name: Install dependencies
         run: |
@@ -49,7 +44,7 @@ jobs:
             liblzma-dev \
             libbz2-dev \
 
-      - name: Download Qt
+      - name: Download Precompiled Static Qt 
         working-directory: ${{ runner.temp }}
         run: |
           wget -q https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/ubuntu/Qt653-static-ubuntu2204.tar.xz
@@ -61,10 +56,9 @@ jobs:
 
       - name: Build
         working-directory: ${{ github.workspace }}
-        env:
-          QT_PATH: ${{ runner.temp }}/Qt-6.5.3-static
         run: |
-          bash ./build-tools/scripts/applications/build-static-linux-app.sh ${{ inputs.app_name }}
+          ${{ runner.temp }}/Qt-6.5.3-static/bin/qmake ..
+          make -j$(nproc)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
