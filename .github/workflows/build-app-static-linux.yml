@@ -47,6 +47,7 @@ jobs:
       - name: Download Precompiled Static Qt 
         working-directory: ${{ runner.temp }}
         run: |
+          curl -L -o Qt6.5.3-static.tar.xz https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/macos/Qt6.5.3-static-arm64.tar.xz
           wget -q https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/ubuntu/Qt653-static-ubuntu2204.tar.xz
           tar xf Qt653-static-ubuntu2204.tar.xz
           cat > ./Qt-6.5.3-static/bin/qt.conf <<EOF
