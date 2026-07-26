@@ -1,7 +1,16 @@
 name: Build Qt 6.5.3 Dynamic (Ubuntu 22.04)
 
 on:
-  workflow_dispatch:      # manual trigger, e.g. from the Actions tab
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      qt_tag:
+        required: false
+        type: string
+        default: qt-6.5.3-dynamic-ubuntu2204
+
+permissions:
+  contents: write
 
 jobs:
   build-qt:
@@ -9,35 +18,18 @@ jobs:
     timeout-minutes: 360
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            xz-utils \
-            build-essential \
-            cmake \
-            ninja-build \
-            libfontconfig1-dev \
-            libfreetype6-dev \
-            libx11* \
-            libxext-dev \
-            libxfixes-dev \
-            libxi-dev \
-            libxrender-dev \
-            libxcb* \
-            libxkbcommon-x11-dev \
-            mesa-common-dev \
-            freeglut3 \
-            freeglut3-dev \
-            libglu1-mesa \
-            libglu1-mesa-dev \
-            libgl1-mesa-glx \
-            libgl1-mesa-dev \
-            python3 \
-            chrpath \
-            zlib1g-dev \
-            liblzma-dev \
-            libbz2-dev
+            xz-utils build-essential cmake ninja-build \
+            libfontconfig1-dev libfreetype6-dev libx11* libxext-dev \
+            libxfixes-dev libxi-dev libxrender-dev libxcb* \
+            libxkbcommon-x11-dev mesa-common-dev freeglut3 freeglut3-dev \
+            libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev \
+            python3 chrpath zlib1g-dev liblzma-dev libbz2-dev
           sudo apt-get clean
 
       - name: Free up disk space
@@ -66,26 +58,18 @@ jobs:
         run: |
           ./configure \
             -prefix ${{ github.workspace }}/Qt6.5.3-dynamic \
-            -release \
-            -confirm-license \
-            -nomake tests \
-            -nomake examples \
-            -no-icu \
-            -no-dbus \
-            -sql-sqlite \
-            -xcb \
-            -xcb-xlib \
-            -bundled-xcb-xinput
+            -release -confirm-license \
+            -nomake tests -nomake examples \
+            -no-icu -no-dbus -sql-sqlite \
+            -xcb -xcb-xlib -bundled-xcb-xinput
 
       - name: Build Qt
         working-directory: qt-everywhere-src-6.5.3
-        run: |
-          cmake --build . -j$(nproc)
+        run: cmake --build . -j$(nproc)
 
       - name: Install Qt
         working-directory: qt-everywhere-src-6.5.3
-        run: |
-          cmake --install .
+        run: cmake --install .
 
       - name: Clean up source tree
         run: |
@@ -95,11 +79,15 @@ jobs:
       - name: Tar the installed Qt directory
         working-directory: ${{ github.workspace }}
         run: |
-          XZ_OPT='-9' tar -cJf ${{ github.workspace }}/Qt6.5.3-dynamic-ubuntu2204.tar.xz Qt6.5.3-dynamic
+          XZ_OPT='-9' tar -cJf Qt6.5.3-dynamic-ubuntu2204.tar.xz Qt6.5.3-dynamic
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Qt6.5.3-dynamic-ubuntu2204
-          path: ${{ github.workspace }}/Qt6.5.3-dynamic-ubuntu2204.tar.xz
-          retention-days: 14
+      - name: Publish as GitHub Release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "${{ inputs.qt_tag }}" --repo "${{ github.repository }}" \
+            || gh release create "${{ inputs.qt_tag }}" --repo "${{ github.repository }}" \
+               --title "Qt 6.5.3 dynamic (Ubuntu 22.04)" \
+               --notes "Precompiled Qt 6.5.3, dynamic linking, Ubuntu 22.04"
+          gh release upload "${{ inputs.qt_tag }}" Qt6.5.3-dynamic-ubuntu2204.tar.xz \
+            --repo "${{ github.repository }}" --clobber

@@ -1,0 +1,82 @@
+name: Dynamic Qt Application Build
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+      artifact_name:
+        required: true
+        type: string
+      qt_release_tag:
+        required: false
+        type: string
+        default: qt-6.5.3-dynamic-ubuntu2204
+
+jobs:
+  check-qt:
+    runs-on: ubuntu-22.04
+    outputs:
+      qt_exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Check if Qt release already exists
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${{ inputs.qt_release_tag }}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-qt:
+    needs: check-qt
+    if: needs.check-qt.outputs.qt_exists == 'false'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/build-qt-dynamic-linux.yml
+    with:
+      qt_tag: ${{ inputs.qt_release_tag }}
+
+  build-linux:
+    needs: [check-qt, build-qt]
+    if: always() && needs.check-qt.result == 'success' && (needs.build-qt.result == 'success' || needs.build-qt.result == 'skipped')
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout shared tools
+        uses: actions/checkout@v4
+        with:
+          repository: Bolbe/github-build-tools
+          path: build-tools
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            chrpath libxkbcommon-x11-dev mesa-common-dev \
+            freeglut3 freeglut3-dev libglu1-mesa libglu1-mesa-dev \
+            libgl1 libgl1-mesa-dev
+
+      - name: Download and extract Qt
+        working-directory: ${{ runner.temp }}
+        run: |
+          curl -L -o qt.tar.xz "https://github.com/${{ github.repository }}/releases/download/${{ inputs.qt_release_tag }}/Qt6.5.3-dynamic-ubuntu2204.tar.xz"
+          tar xf qt.tar.xz
+
+      - name: Build
+        working-directory: ${{ github.workspace }}
+        env:
+          QT_PATH: ${{ runner.temp }}/Qt6.5.3-dynamic
+        run: |
+          bash ./build-tools/scripts/applications/build-linux-app.sh ${{ inputs.app_name }} ${{ inputs.artifact_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}-linux
+          path: ${{ github.workspace }}/${{ inputs.artifact_name }}.AppImage
