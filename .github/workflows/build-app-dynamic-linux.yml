@@ -15,34 +15,7 @@ on:
         default: qt-6.5.3-dynamic-ubuntu2204
 
 jobs:
-  check-qt:
-    runs-on: ubuntu-22.04
-    outputs:
-      qt_exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - name: Check if Qt release already exists
-        id: check
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "${{ inputs.qt_release_tag }}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-  build-qt:
-    needs: check-qt
-    if: needs.check-qt.outputs.qt_exists == 'false'
-    permissions:
-      contents: write
-    uses: ./.github/workflows/build-qt-dynamic-linux.yml
-    with:
-      qt_tag: ${{ inputs.qt_release_tag }}
-
   build-linux:
-    needs: [check-qt, build-qt]
-    if: always() && needs.check-qt.result == 'success' && (needs.build-qt.result == 'success' || needs.build-qt.result == 'skipped')
     runs-on: ubuntu-22.04
 
     steps:
@@ -65,7 +38,12 @@ jobs:
       - name: Download and extract Qt
         working-directory: ${{ runner.temp }}
         run: |
-          curl -L -o qt.tar.xz "https://github.com/${{ github.repository }}/releases/download/${{ inputs.qt_release_tag }}/Qt6.5.3-dynamic-ubuntu2204.tar.xz"
+          URL="https://github.com/Bolbe/github-build-tools/releases/download/${{ inputs.qt_release_tag }}/Qt6.5.3-dynamic-ubuntu2204.tar.xz"
+          if ! curl -fL -o qt.tar.xz "$URL"; then
+            echo "::error::Qt tarball not found at $URL"
+            echo "::error::Run 'Build Qt 6.5.3 Dynamic' manually in Bolbe/github-build-tools first."
+            exit 1
+          fi
           tar xf qt.tar.xz
 
       - name: Build

@@ -2,7 +2,6 @@ name: Build Qt 6.5.3 Dynamic (Ubuntu 22.04)
 
 on:
   workflow_dispatch:
-  workflow_call:
     inputs:
       qt_tag:
         required: false
@@ -15,7 +14,7 @@ permissions:
 jobs:
   build-qt:
     runs-on: ubuntu-22.04
-    timeout-minutes: 360
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v4
