@@ -50,7 +50,7 @@ jobs:
                  qtopcua qtpositioning qtremoteobjects qtsensors qtserialbus \
                  qtserialport qtvirtualkeyboard qtwayland qttools qtwebengine \
                  qtdoc qtspeech qttranslations qtwebview qtwebchannel \
-                 qtwebsockets qthttpserver
+                 qtwebsockets qthttpserver qtquick3d* qtquicktimeline
 
       - name: Configure Qt (dynamic, release)
         working-directory: qt-everywhere-src-6.5.3
