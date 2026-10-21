@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-14
 
     steps:
       - name: Checkout source 
@@ -21,17 +21,17 @@ jobs:
           repository: Bolbe/github-build-tools
           path: build-tools
 
-      - name: Download Qt 6.5.3 Compiler for MacOS
+      - name: Download Qt 6.8.5 Compiler for MacOS (Apple Silicon)
         working-directory: ${{ runner.temp }}
         run: |
-          curl -L -o Qt653-macos.tar.xz https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/macos/Qt653-macos.tar.xz
-          tar xf ./Qt653-macos.tar.xz
+          curl -L -o Qt6.8.5-silicon.tar.xz https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/macos/Qt6.8.5-silicon.tar.xz
+          tar xf ./Qt6.8.5-silicon.tar.xz
 
       - name: Compile project and build package
         working-directory: ${{ github.workspace }}
         env:
-          QT_PATH: ${{ runner.temp }}/Qt-6.5.3
-        run: zsh ./build-tools/scripts/applications/build-macos-app.sh ${{ inputs.app_name }}
+          QT_PATH: ${{ runner.temp }}/Qt-6.8.5-silicon
+        run: zsh ./build-tools/scripts/applications/macos/build-macos-app.sh ${{ inputs.app_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
