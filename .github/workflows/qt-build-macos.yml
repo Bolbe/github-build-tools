@@ -30,7 +30,7 @@ jobs:
       - name: Compile project and build package
         working-directory: ${{ github.workspace }}
         env:
-          QT_PATH: ${{ runner.temp }}/Qt-6.8.5-silicon
+          QT_PATH: ${{ runner.temp }}/Qt6.8.5-silicon
         run: zsh ./build-tools/scripts/applications/macos/build-macos-app.sh ${{ inputs.app_name }}
 
       - name: Upload artifact
