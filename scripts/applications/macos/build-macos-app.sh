@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-appName="$1"
-
 #Check if required arguments are provided
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <AppName>"
@@ -19,6 +17,7 @@ if [ -z "${QT_PATH:-}" ]; then
 fi
 
 echo "Starting macOS build process..."
+appName="$1"
 
 # Clean and create build directory
 rm -rf build
