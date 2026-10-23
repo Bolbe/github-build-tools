@@ -1,0 +1,54 @@
+name: Building Qt Application for macOS
+
+on:
+  workflow_call:
+    inputs:
+      app_name:
+        required: true
+        type: string
+      runner:
+        required: false
+        type: string
+        default: macos-14
+        description: "macOS runner label: macos-14 (Apple Silicon) or macos-15-intel"
+
+jobs:
+  build-macos:
+    runs-on: ${{ inputs.runner }}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Checkout shared tools
+        uses: actions/checkout@v4
+        with:
+          repository: Bolbe/github-build-tools
+          path: build-tools
+
+      - name: Select Qt flavor for runner architecture
+        run: |
+          if [ "${{ runner.arch }}" = "ARM64" ]; then
+            echo "QT_FLAVOR=Silicon" >> "$GITHUB_ENV"
+          else
+            echo "QT_FLAVOR=Intel" >> "$GITHUB_ENV"
+          fi
+
+      - name: Download Qt 6.12.0 precompiled for MacOS
+        working-directory: ${{ runner.temp }}
+        run: |
+          curl -fL -o Qt6.12.0.tar.xz https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/macos/${{ env.QT_FLAVOR }}/Qt6.12.0.tar.xz
+          tar xf ./Qt6.12.0.tar.xz
+
+      - name: Compile project and build package
+        working-directory: ${{ github.workspace }}
+        env:
+          QT_PATH: ${{ runner.temp }}/Qt6.12.0
+        run: zsh ./build-tools/scripts/applications/macos/build-macos-app.sh ${{ inputs.app_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.app_name }}-macos
+          path: ${{ github.workspace }}/${{ inputs.app_name }}.app.zip
+          
