@@ -1,3 +1,6 @@
+# Script to build a Windows application using Qt6.12.0 and MinGW
+# Requires environment variables QT_PATH and MINGW_PATH to be set
+
 #Requires -Version 5.1
 
 $ErrorActionPreference = "Stop"
@@ -17,7 +20,7 @@ $archive_dir = $args[1]
 
 # Check environment variables
 if (-not [Environment]::GetEnvironmentVariable('QT_PATH')) {
-    Write-Error "Environment variable QT_PATH does not exist. It must be set to /path/to/QtMingw64 (folder containing bin/qmake.exe)"
+    Write-Error "Environment variable QT_PATH does not exist. It must be set to /path/to/Qt6.12.0-mingw64 (folder containing bin/qmake.exe)"
     exit 1
 }
 
@@ -61,24 +64,27 @@ cp $env:QT_PATH/bin/Qt6Gui.dll ./$archive_dir
 cp $env:QT_PATH/bin/Qt6Network.dll ./$archive_dir
 cp $env:QT_PATH/bin/Qt6OpenGL.dll ./$archive_dir
 cp $env:QT_PATH/bin/Qt6Qml.dll ./$archive_dir
-cp $env:QT_PATH/bin/Qt6QmlCore.dll ./$archive_dir
 cp $env:QT_PATH/bin/Qt6QmlModels.dll ./$archive_dir
 cp $env:QT_PATH/bin/Qt6QmlWorkerScript.dll ./$archive_dir
 cp $env:QT_PATH/bin/Qt6Quick.dll ./$archive_dir
-cp $env:QT_PATH/bin/Qt6QuickControls2.dll ./$archive_dir
-cp $env:QT_PATH/bin/Qt6QuickControls2Impl.dll ./$archive_dir
-cp $env:QT_PATH/bin/Qt6QuickTemplates2.dll ./$archive_dir
+cp $env:QT_PATH/bin/Qt6QmlMeta.dll ./$archive_dir
 
-mkdir ./$archive_dir/plugins/platforms
-cp $env:QT_PATH/plugins/platforms/qwindows.dll ./$archive_dir/plugins/platforms
+mkdir ./$archive_dir/imageformats
+cp $env:QT_PATH/plugins/imageformats/qgif.dll ./$archive_dir/imageformats
+cp $env:QT_PATH/plugins/imageformats/qjpeg.dll ./$archive_dir/imageformats
+cp $env:QT_PATH/plugins/imageformats/qicns.dll ./$archive_dir/imageformats
+cp $env:QT_PATH/plugins/imageformats/qico.dll ./$archive_dir/imageformats
+cp $env:QT_PATH/plugins/imageformats/qsvg.dll ./$archive_dir/imageformats
+cp $env:QT_PATH/plugins/imageformats/qwebp.dll ./$archive_dir/imageformats
+
+mkdir ./$archive_dir/platforms
+cp $env:QT_PATH/plugins/platforms/qwindows.dll ./$archive_dir/platforms
 
 mkdir ./$archive_dir/qml
-cp $env:QT_PATH/qml/builtins.qmltypes ./$archive_dir/qml
-cp $env:QT_PATH/qml/jsroot.qmltypes ./$archive_dir/qml
+
 cp -R $env:QT_PATH/qml/QtQml ./$archive_dir/qml
 rm -R ./$archive_dir/qml/QtQml/XmlListModel
 rm -R ./$archive_dir/qml/QtQml/Models
-rm -R ./$archive_dir/qml/QtQml/Base
 
 cp -R $env:QT_PATH/qml/QtQuick ./$archive_dir/qml
 rm -R ./$archive_dir/qml/QtQuick/Dialogs
@@ -90,10 +96,6 @@ rm -R ./$archive_dir/qml/QtQuick/Particles
 rm -R ./$archive_dir/qml/QtQuick/Shapes
 rm -R ./$archive_dir/qml/QtQuick/tooling
 rm -R ./$archive_dir/qml/QtQuick/Window
-
-# Create qt.conf
-Write-Host "Creating qt.conf..."
-New-Item ./$archive_dir/qt.conf | Out-Null
 
 # Move back and relocate archive
 Set-Location ..
