@@ -34,7 +34,7 @@ jobs:
       - name: Download and extract Qt
         working-directory: ${{ runner.temp }}
         run: |
-          URL="https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/ubuntu/Qt6120-ubuntu2204.tar.xz"
+          URL="https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/ubuntu/Qt-6.12.0.tar.xz"
           if ! curl -fL -o qt.tar.xz "$URL"; then
             echo "::error::Qt tarball not found at $URL"
             echo "::error::Run 'Build Qt 6.12.0' manually in Bolbe/Qt-precompiled first."
