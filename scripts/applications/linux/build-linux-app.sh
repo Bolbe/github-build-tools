@@ -9,9 +9,6 @@ set -u  # Treat unset variables as errors
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 echo "Script directory: $SCRIPT_DIR"
 
-LINUX_BIN_FILE="$1"
-LINUX_APP_IMAGE="$2"
-
 # Check if required arguments are provided
 if [ $# -ne 2 ]; then
     echo "Usage: $0 <Binary file name> <AppImageName>"
@@ -19,6 +16,9 @@ if [ $# -ne 2 ]; then
     echo "This will build the application and create an AppImage named myapp.AppImage containing the binary MyApp."
     exit 1
 fi
+
+LINUX_BIN_FILE="$1"
+LINUX_APP_IMAGE="$2"
 
 # Check $QT_PATH environment variable
 if [ -z "${QT_PATH:-}" ]; then
@@ -46,7 +46,7 @@ cp $SCRIPT_DIR/default-icon.svg package/default-icon.svg
 cat > package/AppRun <<EOF
 #!/bin/sh
 SELF_DIR="\$(dirname "\$(readlink -f "\$0")")"
-LD_LIBRARY_PATH="\$SELF_DIR/lib" QT_QPA_PLATFORM_PLUGIN_PATH="\$SELF_DIR/plugins" exec "\$SELF_DIR/$LINUX_BIN_FILE"
+QT_QUICK_CONTROLS_STYLE=Material LD_LIBRARY_PATH="\$SELF_DIR/lib" QT_QPA_PLATFORM_PLUGIN_PATH="\$SELF_DIR/plugins" exec "\$SELF_DIR/$LINUX_BIN_FILE"
 EOF
 chmod +x package/AppRun
 
@@ -60,18 +60,20 @@ EOF
 
 echo "Copying shared libraries to lib folder..."
 mkdir -p package/lib
-cp $QT_PATH/lib/libQt6Core.so.6.5.3 package/lib/libQt6Core.so.6
-cp $QT_PATH/lib/libQt6Gui.so.6.5.3 package/lib/libQt6Gui.so.6
-cp $QT_PATH/lib/libQt6Network.so.6.5.3 package/lib/libQt6Network.so.6
-cp $QT_PATH/lib/libQt6OpenGL.so.6.5.3 package/lib/libQt6OpenGL.so.6
-cp $QT_PATH/lib/libQt6Qml.so.6.5.3 package/lib/libQt6Qml.so.6
-cp $QT_PATH/lib/libQt6QmlModels.so.6.5.3 package/lib/libQt6QmlModels.so.6
-cp $QT_PATH/lib/libQt6QmlWorkerScript.so.6.5.3 package/lib/libQt6QmlWorkerScript.so.6
-cp $QT_PATH/lib/libQt6Quick.so.6.5.3 package/lib/libQt6Quick.so.6
-cp $QT_PATH/lib/libQt6QuickControls2.so.6.5.3 package/lib/libQt6QuickControls2.so.6
-cp $QT_PATH/lib/libQt6QuickControls2Impl.so.6.5.3 package/lib/libQt6QuickControls2Impl.so.6
-cp $QT_PATH/lib/libQt6QuickTemplates2.so.6.5.3 package/lib/libQt6QuickTemplates2.so.6
-cp $QT_PATH/lib/libQt6XcbQpa.so.6.5.3 package/lib/libQt6XcbQpa.so.6
+cp $QT_PATH/lib/libQt6Core.so.6.12.0 package/lib/libQt6Core.so.6
+cp $QT_PATH/lib/libQt6Gui.so.6.12.0 package/lib/libQt6Gui.so.6
+cp $QT_PATH/lib/libQt6Network.so.6.12.0 package/lib/libQt6Network.so.6
+cp $QT_PATH/lib/libQt6OpenGL.so.6.12.0 package/lib/libQt6OpenGL.so.6
+cp $QT_PATH/lib/libQt6Qml.so.6.12.0 package/lib/libQt6Qml.so.6
+cp $QT_PATH/lib/libQt6QmlMeta.so.6.12.0 package/lib/libQt6QmlMeta.so.6
+cp $QT_PATH/lib/libQt6QmlModels.so.6.12.0 package/lib/libQt6QmlModels.so.6
+cp $QT_PATH/lib/libQt6QmlWorkerScript.so.6.12.0 package/lib/libQt6QmlWorkerScript.so.6
+cp $QT_PATH/lib/libQt6Quick.so.6.12.0 package/lib/libQt6Quick.so.6
+cp $QT_PATH/lib/libQt6QuickControls2.so.6.12.0 package/lib/libQt6QuickControls2.so.6
+cp $QT_PATH/lib/libQt6QuickControls2Basic.so.6.12.0 package/lib/libQt6QuickControls2Basic.so.6
+cp $QT_PATH/lib/libQt6QuickControls2Material.so.6.12.0 package/lib/libQt6QuickControls2Material.so.6
+cp $QT_PATH/lib/libQt6QuickTemplates2.so.6.12.0 package/lib/libQt6QuickTemplates2.so.6
+cp $QT_PATH/lib/libQt6XcbQpa.so.6.12.0 package/lib/libQt6XcbQpa.so.6
 
 echo "Copying plugins libraries to plugins folder..."
 mkdir -p package/plugins/platforms
@@ -80,13 +82,15 @@ mkdir -p package/plugins/xcbglintegrations
 cp $QT_PATH/plugins/xcbglintegrations/libqxcb-egl-integration.so package/plugins/xcbglintegrations/
 
 echo "Copying QML files to qml folder..."
-mkdir -p package/qml/QtQml
-cp -r $QT_PATH/qml/QtQml/WorkerScript package/qml/QtQml/
-cp $QT_PATH/qml/QtQml/libqmlmetaplugin.so package/qml/QtQml/
+
 mkdir -p package/qml/QtQuick
 cp -r $QT_PATH/qml/QtQuick/Controls package/qml/QtQuick/
 rm -rf package/qml/QtQuick/Controls/designer
+rm -rf package/qml/QtQuick/Controls/FluentWinUI3
+rm -rf package/qml/QtQuick/Controls/Fusion
 rm -rf package/qml/QtQuick/Controls/Imagine
+rm -rf package/qml/QtQuick/Controls/impl
+rm -rf package/qml/QtQuick/Controls/Native
 rm -rf package/qml/QtQuick/Controls/Universal
 cp -r $QT_PATH/qml/QtQuick/Templates package/qml/QtQuick/
 cp $QT_PATH/qml/QtQuick/libqtquick2plugin.so package/qml/QtQuick/
@@ -102,13 +106,18 @@ chrpath -r ./lib/ package/$LINUX_BIN_FILE
 # Rename package directory
 mv package $LINUX_APP_IMAGE
 
-# Download and use appimagetool to create AppImage
-echo "Downloading appimagetool..."
-wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
-chmod +x appimagetool-x86_64.AppImage
+# Download only if not already present and use appimagetool to create AppImage
+if [ ! -f appimagetool-x86_64.AppImage ]; then
+    echo "Downloading appimagetool..."
+    wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+    chmod +x appimagetool-x86_64.AppImage
+fi
 
 echo "Packaging application with appimagetool..."
-./appimagetool-x86_64.AppImage $LINUX_APP_IMAGE $LINUX_APP_IMAGE.AppImage
+# CI containers typically don't have FUSE available, which appimagetool
+# needs to mount itself (it's an AppImage too). Force it to extract-and-run
+# instead of mounting.
+APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool-x86_64.AppImage $LINUX_APP_IMAGE $LINUX_APP_IMAGE.AppImage
 
 # Move the AppImage to the parent directory
 mv $LINUX_APP_IMAGE.AppImage ..

@@ -1,4 +1,4 @@
-name: Dynamic Qt Application Build
+name: Qt Application Build
 
 on:
   workflow_call:
@@ -9,10 +9,6 @@ on:
       artifact_name:
         required: true
         type: string
-      qt_release_tag:
-        required: false
-        type: string
-        default: qt-6.5.3-dynamic-ubuntu2204
 
 jobs:
   build-linux:
@@ -38,10 +34,10 @@ jobs:
       - name: Download and extract Qt
         working-directory: ${{ runner.temp }}
         run: |
-          URL="https://github.com/Bolbe/github-build-tools/releases/download/${{ inputs.qt_release_tag }}/Qt6.5.3-dynamic-ubuntu2204.tar.xz"
+          URL="https://github.com/Bolbe/Qt-precompiled/raw/refs/heads/main/ubuntu/Qt6120-ubuntu2204.tar.xz"
           if ! curl -fL -o qt.tar.xz "$URL"; then
             echo "::error::Qt tarball not found at $URL"
-            echo "::error::Run 'Build Qt 6.5.3 Dynamic' manually in Bolbe/github-build-tools first."
+            echo "::error::Run 'Build Qt 6.12.0' manually in Bolbe/Qt-precompiled first."
             exit 1
           fi
           tar xf qt.tar.xz
@@ -49,7 +45,7 @@ jobs:
       - name: Build
         working-directory: ${{ github.workspace }}
         env:
-          QT_PATH: ${{ runner.temp }}/Qt6.5.3-dynamic
+          QT_PATH: ${{ runner.temp }}/Qt6.12.0
         run: |
           bash ./build-tools/scripts/applications/linux/build-linux-app.sh ${{ inputs.app_name }} ${{ inputs.artifact_name }}
 
