@@ -26,6 +26,7 @@ if [ -z "${QT_PATH:-}" ]; then
     exit 1
 fi
 
+echo "Using Qt installation at: $QT_PATH"
 echo "Starting build process..."
 
 # Clean and create build directory
