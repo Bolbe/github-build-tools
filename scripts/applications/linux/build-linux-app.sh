@@ -73,6 +73,7 @@ cp $QT_PATH/lib/libQt6Quick.so.6.12.0 package/lib/libQt6Quick.so.6
 cp $QT_PATH/lib/libQt6QuickControls2.so.6.12.0 package/lib/libQt6QuickControls2.so.6
 cp $QT_PATH/lib/libQt6QuickControls2Basic.so.6.12.0 package/lib/libQt6QuickControls2Basic.so.6
 cp $QT_PATH/lib/libQt6QuickControls2Material.so.6.12.0 package/lib/libQt6QuickControls2Material.so.6
+cp $QT_PATH/lib/libQt6QuickControls2MaterialStyleImpl.so.6.12.0 package/lib/libQt6QuickControls2MaterialStyleImpl.so.6
 cp $QT_PATH/lib/libQt6QuickTemplates2.so.6.12.0 package/lib/libQt6QuickTemplates2.so.6
 cp $QT_PATH/lib/libQt6XcbQpa.so.6.12.0 package/lib/libQt6XcbQpa.so.6
 
