@@ -71,6 +71,7 @@ cp $QT_PATH/lib/libQt6QmlModels.so.6.12.0 package/lib/libQt6QmlModels.so.6
 cp $QT_PATH/lib/libQt6QmlWorkerScript.so.6.12.0 package/lib/libQt6QmlWorkerScript.so.6
 cp $QT_PATH/lib/libQt6Quick.so.6.12.0 package/lib/libQt6Quick.so.6
 cp $QT_PATH/lib/libQt6QuickControls2.so.6.12.0 package/lib/libQt6QuickControls2.so.6
+cp $QT_PATH/lib/libQt6QuickControls2Impl.so.6.12.0 package/lib/libQt6QuickControls2Impl.so.6
 cp $QT_PATH/lib/libQt6QuickControls2Basic.so.6.12.0 package/lib/libQt6QuickControls2Basic.so.6
 cp $QT_PATH/lib/libQt6QuickControls2Material.so.6.12.0 package/lib/libQt6QuickControls2Material.so.6
 cp $QT_PATH/lib/libQt6QuickControls2MaterialStyleImpl.so.6.12.0 package/lib/libQt6QuickControls2MaterialStyleImpl.so.6
@@ -84,20 +85,9 @@ mkdir -p package/plugins/xcbglintegrations
 cp $QT_PATH/plugins/xcbglintegrations/libqxcb-egl-integration.so package/plugins/xcbglintegrations/
 
 echo "Copying QML files to qml folder..."
-
-mkdir -p package/qml/QtQuick
-cp -r $QT_PATH/qml/QtQuick/Controls package/qml/QtQuick/
-rm -rf package/qml/QtQuick/Controls/designer
-rm -rf package/qml/QtQuick/Controls/FluentWinUI3
-rm -rf package/qml/QtQuick/Controls/Fusion
-rm -rf package/qml/QtQuick/Controls/Imagine
-rm -rf package/qml/QtQuick/Controls/impl
-rm -rf package/qml/QtQuick/Controls/Native
-rm -rf package/qml/QtQuick/Controls/Universal
-cp -r $QT_PATH/qml/QtQuick/Templates package/qml/QtQuick/
-cp $QT_PATH/qml/QtQuick/libqtquick2plugin.so package/qml/QtQuick/
-cp $QT_PATH/qml/QtQuick/plugins.qmltypes package/qml/QtQuick/
-cp $QT_PATH/qml/QtQuick/qmldir package/qml/QtQuick/
+mkdir -p package/qml
+cp -r $QT_PATH/qml/QtQml package/qml/QtQml
+cp -r $QT_PATH/qml/QtQuick package/qml/QtQuick
 
 # Remove debug files
 find package -name "*.debug" -type f -delete
@@ -108,18 +98,18 @@ chrpath -r ./lib/ package/$LINUX_BIN_FILE
 # Rename package directory
 mv package $LINUX_APP_IMAGE
 
-# Download only if not already present and use appimagetool to create AppImage
-if [ ! -f appimagetool-x86_64.AppImage ]; then
-    echo "Downloading appimagetool..."
-    wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
-    chmod +x appimagetool-x86_64.AppImage
+# Download appimagetool-x86_64.AppImage to /tmp only if not already present and use it to create AppImage
+if [ ! -f /tmp/appimagetool-x86_64.AppImage ]; then
+    echo "Downloading appimagetool-x86_64.AppImage to /tmp"
+    wget -q -O /tmp/appimagetool-x86_64.AppImage https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+    chmod +x /tmp/appimagetool-x86_64.AppImage
 fi
 
 echo "Packaging application with appimagetool..."
 # CI containers typically don't have FUSE available, which appimagetool
 # needs to mount itself (it's an AppImage too). Force it to extract-and-run
 # instead of mounting.
-APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool-x86_64.AppImage $LINUX_APP_IMAGE $LINUX_APP_IMAGE.AppImage
+APPIMAGE_EXTRACT_AND_RUN=1 /tmp/appimagetool-x86_64.AppImage $LINUX_APP_IMAGE $LINUX_APP_IMAGE.AppImage
 
 # Move the AppImage to the parent directory
 mv $LINUX_APP_IMAGE.AppImage ..
