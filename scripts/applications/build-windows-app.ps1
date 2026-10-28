@@ -83,19 +83,7 @@ cp $env:QT_PATH/plugins/platforms/qwindows.dll ./$archive_dir/platforms
 mkdir ./$archive_dir/qml
 
 cp -R $env:QT_PATH/qml/QtQml ./$archive_dir/qml
-rm -R ./$archive_dir/qml/QtQml/XmlListModel
-rm -R ./$archive_dir/qml/QtQml/Models
-
 cp -R $env:QT_PATH/qml/QtQuick ./$archive_dir/qml
-rm -R ./$archive_dir/qml/QtQuick/Dialogs
-rm -R ./$archive_dir/qml/QtQuick/Effects
-rm -R ./$archive_dir/qml/QtQuick/Layouts
-rm -R ./$archive_dir/qml/QtQuick/LocalStorage
-rm -R ./$archive_dir/qml/QtQuick/NativeStyle
-rm -R ./$archive_dir/qml/QtQuick/Particles
-rm -R ./$archive_dir/qml/QtQuick/Shapes
-rm -R ./$archive_dir/qml/QtQuick/tooling
-rm -R ./$archive_dir/qml/QtQuick/Window
 
 # Move back and relocate archive
 Set-Location ..

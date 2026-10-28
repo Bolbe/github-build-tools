@@ -109,24 +109,6 @@ rm -rf $appName.app/Contents/Resources/qml/Qt
 rm -rf $appName.app/Contents/Resources/qml/QtCore
 rm -rf $appName.app/Contents/Resources/qml/QtQuick3D
 rm -rf $appName.app/Contents/Resources/qml/QtTest
-rm -rf $appName.app/Contents/Resources/qml/QtQml/Base
-rm -rf $appName.app/Contents/Resources/qml/QtQml/Models
-rm -rf $appName.app/Contents/Resources/qml/QtQml/XmlListModel
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Dialogs
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Effects
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Layouts
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/LocalStorage
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/NativeStyle
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Particles
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Shapes
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Timeline
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Window
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/tooling
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/Imagine
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/Universal
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/designer
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/iOS
-rm -rf $appName.app/Contents/Resources/qml/QtQuick/Controls/impl
 
 ditto -c -k --sequesterRsrc --keepParent $appName.app $appName.app.zip
 mv $appName.app.zip ..
